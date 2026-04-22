@@ -1,0 +1,11 @@
+{
+    "name": "Administration",
+    "alias": "administration",
+    "description": "Administration module for profile, admin users, and application settings.",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Administration\\Providers\\AdministrationServiceProvider"
+    ],
+    "files": []
+}
