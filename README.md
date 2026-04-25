@@ -26,11 +26,18 @@ A single-page application for building forms, managing submissions with generati
   <a href="https://trialfb.kdigital.technology/"><p>Form Builder tiral visit this site</p></a>
 </div>
 
-    Trial Access Login
-	| Field      | Value            |
-    | ---------- | ---------------- |
-    | **Email**  | `builder@kdigital.technology` |
-    | **Password** | `password`      |
+<details>
+<summary><b>Trial Access Login /summary>
+
+
+```user trial
+user : builder@kdigital.technology
+password : password
+```
+
+</details>
+
+        
 
 ## Features
 
