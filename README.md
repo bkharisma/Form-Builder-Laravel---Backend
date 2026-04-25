@@ -23,8 +23,14 @@ A single-page application for building forms, managing submissions with generati
   <img src="Dashboard.png" alt="Form Builder in action" width="500"> <img src="Field type.png" alt="Form Builder in action" width="500"><br/>
   <img src="autofill.gif" alt="Form Builder in action" width="400"> <img src="Dynamic Report.gif" alt="Form Builder in action" width="400">
   <p><em>Drag-and-drop form builder with live preview and 13+ field types</em></p>
-  <a href="https://formbuilder.kdigital.technology"><p>Form Builder tiral visit this site</p></a>
+  <a href="https://trialfb.kdigital.technology/"><p>Form Builder tiral visit this site</p></a>
 </div>
+
+    Trial Access Login
+	| Field      | Value            |
+    | ---------- | ---------------- |
+    | **Email**  | `builder@kdigital.technology` |
+    | **Password** | `password`      |
 
 ## Features
 
