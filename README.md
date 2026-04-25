@@ -1,435 +1,390 @@
-<h1 align="center">🔗 Form Builder — Backend</h1>
+<div align="center">
 
-<p align="center">
-API backend for the Digital Guest Book form builder. Built with Laravel 13, serves a React SPA frontend.
-</p>
+# 📝 Form Builder - Frontend
 
----
+### Modern drag-and-drop form builder SPA built with React 19, TypeScript, and Vite
 
-## ⚠️ Important — This is a SPA Backend
+[![React 19](https://img.shields.io/badge/react-19-61dafb.svg?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/typescript-5.x-3178c6.svg?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/vite-6.x-646cff.svg?style=for-the-badge&logo=vite&logoColor=white)](https://vite.dev/)
+[![TailwindCSS 4](https://img.shields.io/badge/tailwindcss-4.x-06b6d4.svg?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![Testing: Vitest](https://img.shields.io/badge/testing-vitest-6da13f.svg?style=for-the-badge)](https://vitest.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-**This directory contains ONLY the API backend.** There are no server-rendered views (Blade templates). The frontend is a separate React application located in `../frontend/`.
+A single-page application for building forms, managing submissions with generating dynamic reports and autofilled form with unique data type feature  — all connected to a Laravel backend API.
 
-To run the full application, you need **both** the backend and frontend running simultaneously:
-
-| Service | URL | Directory |
-|---------|-----|-----------|
-| Backend API | http://localhost:8000 | `backend/` |
-| Frontend SPA | http://localhost:5173 | `frontend/` |
-
-👉 [Jump to Frontend Setup](#-frontend-setup)
+[Quick Start](#quick-start) · [Features](#features) · [Project Structure](#project-structure) · [Configuration](#configuration) · [Scripts](#available-scripts) · [Troubleshooting](#troubleshooting)
 
 ---
 
-## ✨ Features
+</div>
 
-- **Multi-Form Builder** — Create and manage multiple forms, each with its own slug-based URL
-- **13 Field Types** — Text, TextArea, Email, Number, Tel, Select, Checkbox, Radio, Date, Time, File Upload, Image Upload, Signature
-- **Conditional Logic** — Show/hide fields dynamically based on other field values
-- **Unique Data & Auto-fill** — Mark a field as unique to auto-populate form data from previous submissions
-- **File & Image Uploads** — With size limits and extension validation
-- **Signature Capture** — Canvas-based digital signature input
-- **Cloudflare Turnstile** — Bot protection on login and form submission
-- **Two-Factor Authentication** — Google Authenticator (TOTP) for admin accounts
-- **Attendance Manager** — Event management, QR code check-in, invitation emails
-- **Dynamic Reports** — Chart-based analytics with multi-field aggregation
-- **Export Options** — CSV, Excel (XLSX), and PDF export
-- **Bulk User Upload** — CSV-based admin user creation
-- **Modular Architecture** — FormBuilder and Administration modules via `nwidart/laravel-modules`
+<div align="center">
+  <img src="Dashboard.png" alt="Form Builder in action" width="500"> <img src="Field type.png" alt="Form Builder in action" width="500"><br/>
+  <img src="autofill.gif" alt="Form Builder in action" width="400"> <img src="Dynamic Report.gif" alt="Form Builder in action" width="400">
+  <p><em>Drag-and-drop form builder with live preview and 13+ field types</em></p>
+  <a href="https://formbuilder.kdigital.technology"><p>Form Builder tiral visit this site</p></a>
+</div>
 
----
+## Features
 
-## 📋 Prerequisites
+| Feature                      | Description                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------- |
+| **Public Form Submission**   | Users fill out forms at `/form/{slug}` — no login required                                   |
+| **Admin Dashboard**          | Manage forms, view submissions, generate reports from a single panel                        |
+| **Drag-and-Drop Builder**    | Visual field editor with 13+ field types powered by `@dnd-kit`                              |
+| **Auto-Fill**                | Automatically populate fields from previous submissions                                     |
+| **Dynamic Reports**          | Chart-based analytics with Chart.js — bar, pie, line, and more                              |
+| **Export**                   | Download submissions as CSV, Excel (XLSX), or PDF                                            |
+| **Rich Text Editor**         | `@tiptap` powered WYSIWYG field type                                                        |
+| **Signature Capture**        | `react-signature-canvas` for handwritten signature fields                                   |
+| **Responsive**               | Fully functional on mobile and desktop                                                       |
+| **Bot Protection**           | Cloudflare Turnstile on login and form submission                                            |
 
-| Requirement | Version | Notes |
-|-------------|---------|-------|
-| PHP | 8.3+ | Extensions: `mbstring`, `xml`, `mysql`, `curl`, `zip`, `gd` |
-| Composer | Latest | [Install guide](https://getcomposer.org/download/) |
-| MySQL / MariaDB | 5.7+ / 10.3+ | Or use SQLite for quick local dev |
-| Node.js | 18+ | Required for the frontend |
-| npm | Latest | Comes with Node.js |
+## Quick Start
 
----
+### Prerequisites
 
-## 🚀 Quick Start (Backend)
+| Tool        | Version                  |
+| ----------- | ------------------------ |
+| **Node.js** | 18+                      |
+| **npm**     | 9+                       |
+| **PHP**     | 8.3+ (for backend)       |
+| **Composer** | 2.x (for backend)       |
+| **MySQL**   | 5.7+ / MariaDB 10.3+     |
 
-### 1. Install Dependencies
+### 1. Backend Setup (Required First)
+
+The frontend is a SPA — all data comes from the Laravel backend API. You **must** set it up first.
 
 ```bash
-cd backend
+cd ../backend
+
 composer install
-```
-
-### 2. Configure Environment
-
-```bash
 cp .env.example .env
 php artisan key:generate
 ```
 
-### 3. Configure Database
-
-Edit `.env` and set your database credentials:
+Edit `backend/.env` and configure your database:
 
 ```env
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=digital_guest_book
-DB_USERNAME=dgb_user
-DB_PASSWORD=dgb_password
+DB_DATABASE=form_builder
+DB_USERNAME=your_user
+DB_PASSWORD=your_password
 ```
 
-> **Tip**: Create the database first: `mysql -u root -e "CREATE DATABASE digital_guest_book;"`
-
-### 4. Configure Turnstile (Required)
-
-Cloudflare Turnstile is required for login and form submission. For development, use test keys:
-
-```env
-TURNSTILE_SITE_KEY=1x00000000000000000000AA
-TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
-```
-
-> Get real keys at [Cloudflare Turnstile](https://developers.cloudflare.com/turnstile/).
-
-### 5. Run Migrations & Seeders
+Run migrations and seeders (creates the default admin user and a sample form):
 
 ```bash
 php artisan migrate:fresh --seed
 ```
 
-This creates:
-- Default admin user (`admin@admin.com` / `admin123`)
-- Sample form configuration ("Data Input Mahasiswa")
-- Sample submissions for testing
+<details>
+<summary><b>Cloudflare Turnstile Setup</b> (required for login & form submission)</summary>
 
-### 6. Start the Backend Server
+Turnstile is required for bot protection. For development, use Cloudflare's test keys:
+
+```env
+# In backend/.env
+TURNSTILE_SITE_KEY=1x00000000000000000000AA
+TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
+```
+
+For production, get real keys at [Cloudflare Turnstile Dashboard](https://dash.cloudflare.com/?to=/:account/turnstile).
+
+</details>
+
+Start the backend server:
 
 ```bash
 php artisan serve
+# API available at http://localhost:8000
 ```
 
-Backend is now running at **http://localhost:8000**
-
----
-
-## 🖥️ Frontend Setup
-
-The frontend is a React SPA that connects to this backend API. You must run it alongside the backend.
-
-### 1. Open a New Terminal
-
-Keep the backend server running in your first terminal.
-
-### 2. Navigate to Frontend Directory
+### 2. Frontend Setup
 
 ```bash
 cd frontend
-```
 
-(Or `cd ../frontend` from the `backend/` directory)
-
-### 3. Install Dependencies
-
-```bash
 npm install
+cp .env.example .env
 ```
 
-### 4. Configure Environment
-
-Create `frontend/.env`:
+Edit `frontend/.env`:
 
 ```env
-VITE_API_URL=http://localhost:8000/api
+# API URL — for local dev, the Vite proxy handles this
+# (requests to /api and /storage are proxied to http://localhost:8000)
+VITE_API_URL=/api
+
+# Cloudflare Turnstile site key (use test key for development)
 VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+
+# App name shown in browser tab
+VITE_APP_NAME="Form Builder"
 ```
 
-### 5. Start the Development Server
+Start the development server:
 
 ```bash
 npm run dev
+# Frontend available at http://localhost:5173
 ```
 
-Frontend is now running at **http://localhost:5173**
+### 3. Log In
 
-### 6. Access the Application
+Go to [http://localhost:5173](http://localhost:5173):
 
-Open http://localhost:5173 in your browser and log in:
-
-- **Email**: `admin@dgb.local`
-- **Password**: `password`
+| Field      | Value            |
+| ---------- | ---------------- |
+| **Email**  | `admin@dgb.local` |
+| **Password** | `password`      |
 
 ---
 
-## 🔑 Default Credentials
+## How It Connects to the Backend
 
-> ⚠️ **Change these in production!**
-
-| Role | Email | Password |
-|------|-------|----------|
-| Admin | `admin@dgb.local` | `password` |
-
----
-
-## ⚡ One-Command Dev Setup
-
-Laravel's `composer dev` script runs everything concurrently (server, queue, logs, Vite):
-
-```bash
-cd backend
-composer dev
-```
-
-This starts:
-- `php artisan serve` — API server
-- `php artisan queue:listen` — Background job processor
-- `php artisan pail` — Real-time log viewer
-- `npm run dev` — Frontend Vite dev server
-
-> Note: You still need to configure `frontend/.env` separately for the API URL.
-
----
-
-## 🏗️ Architecture
-
-This backend uses a **modular architecture** via [`nwidart/laravel-modules`](https://github.com/nWidart/laravel-modules). Each module is self-contained with its own routes, controllers, models, and views.
-
-### Modules
-
-| Module | Purpose |
-|--------|---------|
-| **FormBuilder** | Form configurations, submissions, auto-fill, reports, file uploads |
-| **Administration** | Authentication, users, settings, 2FA, attendance manager, invitations |
-
-### Directory Structure
+The Vite dev server proxies API requests so both frontend and backend run seamlessly in development:
 
 ```
-backend/
-├── app/
-│   ├── Http/Controllers/Api/     # Core API controllers (auth, profile)
-│   ├── Models/                   # Eloquent models
-│   └── Services/                 # Business logic services
-├── Modules/
-│   ├── FormBuilder/              # Form builder module
-│   │   ├── app/                  # Controllers, Models, Services
-│   │   ├── routes/               # Module routes
-│   │   └── config/               # Module config
-│   └── Administration/           # Administration module
-│       ├── app/                  # Controllers, Models, Services
-│       ├── routes/               # Module routes
-│       └── config/               # Module config
-├── database/
-│   ├── migrations/               # Database migrations
-│   └── seeders/                  # Data seeders
-├── routes/
-│   ├── api.php                   # Auth routes
-│   └── web.php                   # Web routes
-└── config/                       # Laravel configuration
+┌──────────────────┐        ┌──────────────────────┐        ┌──────────────────┐
+│  Browser         │───────>│  Vite Dev Server     │───────>│  Laravel API     │
+│  localhost:5173  │<───────│  (Proxy)             │<───────│  localhost:8000  │
+└──────────────────┘        └──────────────────────┘        └──────────────────┘
+   /api/* → proxied             /api, /storage                REST API
+   /storage/* → proxied         forwarded                     + Storage
 ```
 
----
+Configured in `vite.config.ts`:
 
-## 📡 API Endpoints
-
-### Public Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/public/settings` | Get public app settings |
-| `GET` | `/api/public/form-config/{slug}` | Get form configuration |
-| `GET` | `/api/public/lookup/{formSlug}` | Auto-fill lookup by unique field |
-| `GET` | `/api/public/attend/{identifier}` | Get attendee info for check-in |
-| `POST` | `/api/public/attend/check-in` | Self check-in for attendees |
-| `POST` | `/api/submissions/{formSlug}` | Submit a form (requires Turnstile) |
-
-### Auth Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/login` | Login (email + password + Turnstile) |
-| `POST` | `/api/login/2fa` | Verify 2FA code |
-| `POST` | `/api/logout` | Logout (auth required) |
-| `GET` | `/api/user` | Get current user (auth required) |
-
-### Profile Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/profile` | Get profile |
-| `PUT` | `/api/profile` | Update profile |
-| `PUT` | `/api/profile/password` | Change password |
-| `GET` | `/api/profile/login-history` | Login history |
-| `POST` | `/api/profile/two-factor/enable` | Enable 2FA |
-| `POST` | `/api/profile/two-factor/verify` | Verify 2FA setup |
-| `POST` | `/api/profile/two-factor/disable` | Disable 2FA |
-
-### Admin Endpoints (Auth Required)
-
-#### Form Configurations
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/form-configs` | List all forms |
-| `POST` | `/api/admin/form-configs` | Create form |
-| `GET` | `/api/admin/form-configs/{slug}` | Get form by slug |
-| `PUT` | `/api/admin/form-configs/{slug}` | Update form |
-| `DELETE` | `/api/admin/form-configs/{slug}` | Delete form |
-
-#### Submissions
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/submissions` | List submissions (filterable) |
-| `GET` | `/api/admin/submissions/{id}` | Get submission details |
-| `GET` | `/api/admin/submissions/stats` | Submission statistics |
-| `GET` | `/api/admin/submissions/export` | Export to CSV |
-| `GET` | `/api/admin/submissions/export/xlsx` | Export to Excel |
-
-#### File Uploads
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `POST` | `/api/admin/upload/file` | Upload a file |
-| `POST` | `/api/admin/upload/image` | Upload an image |
-| `GET` | `/api/upload/{id}` | Serve uploaded file |
-
-#### Reports
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/reports/dynamic-fields` | Get chart-compatible fields |
-| `GET` | `/api/admin/reports/dynamic` | Get aggregated report data |
-| `GET` | `/api/reports/submissions-over-time` | Submissions over time chart |
-
-#### Admin Users (Admin Role Required)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin-users` | List users |
-| `POST` | `/api/admin-users` | Create user |
-| `PUT` | `/api/admin-users/{id}` | Update user |
-| `DELETE` | `/api/admin-users/{id}` | Delete user |
-| `GET` | `/api/admin-users/template` | Download bulk upload template |
-| `POST` | `/api/admin-users/bulk` | Bulk upload users via Excel |
-
-#### Settings (Admin Role Required)
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/admin/settings` | Get app settings |
-| `PUT` | `/api/admin/settings` | Update app settings |
-| `POST` | `/api/admin/settings/logo` | Upload logo |
-| `POST` | `/api/admin/settings/favicon` | Upload favicon |
-
-#### Attendance Manager
-
-| Method | Path | Description |
-|--------|------|-------------|
-| `GET` | `/api/attendance/events` | List events |
-| `POST` | `/api/attendance/events` | Create event |
-| `GET` | `/api/attendance/events/{slug}` | Get event details |
-| `PUT` | `/api/attendance/events/{slug}` | Update event |
-| `DELETE` | `/api/attendance/events/{slug}` | Delete event |
-| `GET` | `/api/attendance/events/{slug}/attendees` | List event attendees |
-| `POST` | `/api/attendance/events/{slug}/attendees/bulk-import` | Bulk import attendees |
-| `POST` | `/api/attendance/check-in` | Admin manual check-in |
-| `GET` | `/api/attendance/events/{slug}/report` | Get event attendance report |
-| `GET` | `/api/attendance/events/{slug}/export` | Export attendance to Excel |
-
----
-
-## 🧪 Testing
-
-### Backend Tests
-
-```bash
-cd backend
-
-# Run all tests
-php artisan test
-
-# Run with coverage
-php artisan test --coverage
-
-# Run specific test class
-php artisan test --filter=Submission
+```ts
+server: {
+  proxy: {
+    '/api': { target: 'http://localhost:8000', changeOrigin: true },
+    '/storage': { target: 'http://localhost:8000', changeOrigin: true },
+  },
+}
 ```
 
-**Test Stats**: 242 tests, 749 assertions covering models, services, controllers, API endpoints, validation, and auth.
+<details>
+<summary><b>Production Deployment</b></summary>
 
-### Frontend Tests
-
-```bash
-cd frontend
-
-# Run tests once
-npm run test:run
-
-# Run in watch mode
-npm test
-```
-
----
-
-## 🔧 Troubleshooting
-
-### "No form config found" error
-
-Run the seeder to create a default form:
-
-```bash
-cd backend
-php artisan db:seed
-```
-
-### Login fails with "cf_turnstile_response is required"
-
-Turnstile is required for login. Ensure keys are configured in both `.env` files:
+For production, set `VITE_API_URL` to the full backend URL, rebuild, and serve the `dist/` folder:
 
 ```env
-# backend/.env
-TURNSTILE_SITE_KEY=1x00000000000000000000AA
-TURNSTILE_SECRET_KEY=1x0000000000000000000000000000000AA
-
-# frontend/.env
-VITE_TURNSTILE_SITE_KEY=1x00000000000000000000AA
+VITE_API_URL=https://your-api-domain.com/api
 ```
 
-### Auto-fill not working on public form
+```bash
+npm run build    # Output goes to dist/
+```
 
-Check that:
-1. The field is marked as `is_unique: true` in the form builder
-2. There are existing submissions with matching data (5+ character input required)
-3. The `PublicFormConfigResource` returns `is_unique` in the API response
+Serve `dist/` with any static file server (Nginx, Apache, etc.). Ensure the backend CORS `FRONTEND_URL` matches your production domain.
 
-### CORS errors
+</details>
 
-Verify `FRONTEND_URL` in `backend/.env` matches your frontend URL:
+---
+
+## Project Structure
+
+```
+frontend/
+├── public/                  # Static assets (favicon, etc.)
+├── src/
+│   ├── components/          # Reusable UI components
+│   ├── pages/               # Page-level components
+│   │   ├── LandingPage.tsx  # Public landing page
+│   │   ├── LoginPage.tsx    # Admin login
+│   │   ├── DashboardPage.tsx
+│   │   ├── SubmissionPage.tsx  # Public form submission
+│   │   ├── SettingsPage.tsx
+│   │   ├── ProfilePage.tsx
+│   │   ├── AdminUsersPage.tsx
+│   │   ├── FormDashboardPage.tsx
+│   │   └── form/            # Form-related pages
+│   │       ├── FormBuilderPage.tsx
+│   │       ├── FormSubmissionsPage.tsx
+│   │       ├── FormReportsPage.tsx
+│   │       ├── FormTitlePage.tsx
+│   │       └── FormDashboardListPage.tsx
+│   ├── services/            # API service layer (axios)
+│   ├── hooks/               # Custom React hooks
+│   ├── types/               # TypeScript type definitions
+│   ├── utils/               # Utility functions
+│   ├── config/              # App configuration
+│   ├── layouts/             # Layout components
+│   ├── assets/              # Images, fonts, etc.
+│   ├── test/                # Test setup and utilities
+│   ├── App.tsx              # Root component with routing
+│   ├── App.css              # Global styles
+│   ├── index.css            # TailwindCSS imports
+│   └── main.tsx             # Entry point
+├── .env                     # Environment variables
+├── .env.example             # Environment template
+├── index.html               # HTML entry point
+├── vite.config.ts           # Vite + Vitest configuration
+├── tsconfig.json            # TypeScript configuration
+├── eslint.config.js         # ESLint configuration
+└── package.json             # Dependencies and scripts
+```
+
+---
+
+## Key Dependencies
+
+| Package                       | Purpose                              |
+| ----------------------------- | ------------------------------------ |
+| **React 19**                  | UI framework                         |
+| **TypeScript**                | Type safety                          |
+| **Vite**                      | Build tool and dev server with HMR   |
+| **TailwindCSS 4**             | Utility-first CSS framework          |
+| **react-router-dom**          | Client-side routing (SPA)            |
+| **axios**                     | HTTP client for API calls            |
+| **@dnd-kit**                  | Drag-and-drop for Form Builder       |
+| **@tiptap**                   | Rich text editor field type          |
+| **Chart.js + react-chartjs-2**| Dynamic report charts                |
+| **jsPDF + autotable + html2canvas** | PDF export generation          |
+| **react-signature-canvas**    | Signature capture field              |
+| **Vitest + Testing Library**  | Unit and integration tests           |
+
+---
+
+## Configuration
+
+### Environment Variables
+
+| Variable                | Description                                        | Default                              |
+| ----------------------- | -------------------------------------------------- | ------------------------------------ |
+| `VITE_API_URL`          | Backend API base URL                               | `/api` (uses Vite proxy in dev)      |
+| `VITE_TURNSTILE_SITE_KEY` | Cloudflare Turnstile site key                    | `1x00000000000000000000AA` (test key) |
+| `VITE_APP_NAME`         | App display name in browser tab                    | `"Kopega Poltekpar Palembang APP"`   |
+
+### Backend Variables (in `backend/.env`)
+
+| Variable              | Description                       | Default   |
+| --------------------- | --------------------------------- | --------- |
+| `DB_CONNECTION`       | Database driver                   | `mysql`   |
+| `DB_HOST`             | Database host                     | `127.0.0.1` |
+| `DB_PORT`             | Database port                     | `3306`    |
+| `DB_DATABASE`         | Database name                     | `form_builder` |
+| `DB_USERNAME`         | Database user                     | —         |
+| `DB_PASSWORD`         | Database password                 | —         |
+| `TURNSTILE_SITE_KEY`  | Turnstile site key (must match frontend) | —   |
+| `TURNSTILE_SECRET_KEY`| Turnstile secret key              | —         |
+| `FRONTEND_URL`        | Frontend URL for CORS             | `http://localhost:5173` |
+
+See [`.env.example`](.env.example) for all supported parameters.
+
+---
+
+## Available Scripts
+
+| Command              | Description                                              |
+| -------------------- | -------------------------------------------------------- |
+| `npm run dev`        | Start dev server with HMR at [localhost:5173](http://localhost:5173) |
+| `npm run build`      | Type-check and build for production (`dist/`)            |
+| `npm run preview`    | Preview the production build locally                     |
+| `npm run lint`       | Run ESLint checks                                        |
+| `npm run test`       | Run tests in watch mode                                  |
+| `npm run test:run`   | Run tests once (CI-friendly)                             |
+
+---
+
+## Troubleshooting
+
+<details>
+<summary><b>Login fails with "cf_turnstile_response is required"</b></summary>
+
+Turnstile is required on the login page. Ensure both `.env` files have matching keys:
+
+- `backend/.env` → `TURNSTILE_SITE_KEY` and `TURNSTILE_SECRET_KEY`
+- `frontend/.env` → `VITE_TURNSTILE_SITE_KEY`
+
+For development, use [Cloudflare's test keys](https://developers.cloudflare.com/turnstile/troubleshooting/testing/).
+
+</details>
+
+<details>
+<summary><b>CORS errors</b></summary>
+
+Make sure `FRONTEND_URL` in `backend/.env` matches your frontend URL:
 
 ```env
 FRONTEND_URL=http://localhost:5173
 ```
 
-### Import errors in frontend
+</details>
 
-Ensure all dependencies are installed:
+<details>
+<summary><b>npm install fails</b></summary>
+
+Ensure Node.js 18+ is installed:
 
 ```bash
-cd frontend
+node -v   # Should be v18 or higher
+npm -v    # Should be v9 or higher
+```
+
+If dependency conflicts persist, delete `node_modules` and `package-lock.json`, then retry:
+
+```bash
+rm -rf node_modules package-lock.json
 npm install
+```
+
+</details>
+
+<details>
+<summary><b>API returns 404</b></summary>
+
+The backend server must be running at `http://localhost:8000`. Start it with:
+
+```bash
+cd ../backend && php artisan serve
+```
+
+Also verify the Vite proxy is configured correctly in `vite.config.ts`.
+
+</details>
+
+---
+
+## More Documentation
+
+- **[../README.md](../README.md)** — Full project overview, architecture, and API reference
+- **[../QUICK-START.md](../QUICK-START.md)** — Detailed setup guide for both frontend and backend
+- **[../MIGRATION-GUIDE.md](../MIGRATION-GUIDE.md)** — Migration from legacy static fields
+
+---
+
+## Contributing
+
+- Report bugs or suggest features via [Issues](https://github.com/YOUR_USERNAME/YOUR_REPO/issues)
+- Improve test coverage
+- Add new field types to the Form Builder
+- Submit PRs with `npm run lint` and `npm run test:run` passing
+
+```bash
+git checkout -b my-feature
+npm run lint && npm run test:run
+# Open a pull request
 ```
 
 ---
 
-## 📚 More Documentation
+## License
 
-- **[Project README](../README.md)** — Full architecture, field types, usage guides, deployment
-- **[Quick Start Guide](../QUICK-START.md)** — Detailed setup walkthrough with troubleshooting
-- **[Migration Guide](../MIGRATION-GUIDE.md)** — Migration from legacy static fields to dynamic forms
+MIT License. See [LICENSE](LICENSE) for details.
 
----
+Built with [React](https://react.dev/) · [TypeScript](https://www.typescriptlang.org/) · [Vite](https://vite.dev/) · [TailwindCSS](https://tailwindcss.com/) · [Chart.js](https://www.chartjs.org/)
+```
 
-## 📄 License
+**A few things to customize before using:**
 
-Private and proprietary.
+1. **Screenshot** — Replace `pic.png` with an actual screenshot of your Form Builder UI, or remove the image block entirely.
+2. **License badge** — I used MIT as a placeholder. Change it if your project uses a different license.
+3. **GitHub links** — Replace `YOUR_USERNAME/YOUR_REPO` in the Contributing section with your actual repo path.
+4. **`VITE_APP_NAME` default** — The default in your `.env.example` is `"Kopega Poltekpar Palembang APP"` which looks institution-specific. I kept it as-is in the table but used `"Form Builder"` in the setup example for clarity. Adjust as needed.
