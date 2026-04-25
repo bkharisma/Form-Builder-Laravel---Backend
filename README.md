@@ -27,7 +27,7 @@ A single-page application for building forms, managing submissions with generati
 </div>
 
 <details>
-<summary><b>Trial Access Login /summary>
+<summary><b>Trial Access Login </b></summary>
 
 
 ```user trial
